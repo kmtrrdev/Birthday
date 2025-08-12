@@ -16,28 +16,12 @@
     background: radial-gradient(1200px 600px at 50% 0%, var(--bg1) 0%, var(--bg2) 60%);
     color:var(--fg); min-height:100vh; display:flex; flex-direction:column;
     align-items:center; justify-content:center; overflow:hidden; text-align:center;
-    cursor: none; transition: filter 0.5s ease;
+    transition: filter 0.5s ease;
   }
   
   /* Blur effect - excludes the big heart */
   body.blurred > *:not(.big-heart-overlay) {
     filter: blur(8px);
-  }
-  
-  /* Custom Cursor */
-  .cursor {
-    position: fixed;
-    width: 20px;
-    height: 20px;
-    background: radial-gradient(circle, #ff69b4, #ff1493);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transition: transform 0.1s ease;
-    box-shadow: 0 0 15px rgba(255, 105, 180, 0.6);
-  }
-  .cursor.click {
-    transform: scale(1.5);
   }
 
   h1{font-size:2rem; margin:18px 12px 8px; transition: all 0.3s ease;}
@@ -80,23 +64,23 @@
   .heart-rain::before{top:-9px;left:0}.heart-rain::after{left:-9px;top:0}
   @keyframes fallHeart{0%{transform:translateY(-10vh) rotate(45deg) scale(0);opacity:0}5%{opacity:.95; transform:translateY(-5vh) rotate(45deg) scale(1)}100%{transform:translateY(110vh) rotate(405deg) scale(0.5);opacity:0}}
 
-  /* Heart container */
+  /* Heart container - optimized for mobile 1080x1980 */
   .heart-container {
     position: fixed;
-    bottom: 30px;
+    bottom: 80px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 200;
     display: none;
-    width: 200px;
-    height: 250px;
+    width: 280px;
+    height: 320px;
   }
 
-  /* Main heart */
+  /* Main heart - larger for mobile */
   .heart-shell {
     position: relative;
-    width: 200px;
-    height: 180px;
+    width: 280px;
+    height: 252px;
     cursor: pointer;
     z-index: 2;
     transition: all 0.3s ease;
@@ -111,16 +95,16 @@
   .heart-shell::before, .heart-shell::after {
     content: "";
     position: absolute;
-    width: 100px;
-    height: 160px;
+    width: 140px;
+    height: 224px;
     background: linear-gradient(145deg, #ff69b4, #ff1493);
-    border-radius: 100px 100px 0 0;
+    border-radius: 140px 140px 0 0;
     top: 0;
     box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3), 0 5px 15px rgba(0, 0, 0, 0.3);
   }
 
   .heart-shell::before {
-    left: 100px;
+    left: 140px;
     transform: rotate(-45deg);
     transform-origin: 0 100%;
   }
@@ -136,18 +120,18 @@
     50% { transform: scale(1.03); }
   }
 
-  /* Note */
+  /* Note - larger for mobile */
   .note {
     position: absolute;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%) translateY(120%);
-    width: 160px;
-    height: 200px;
+    width: 240px;
+    height: 280px;
     background: var(--paper);
     border-radius: 10px;
     color: #333;
-    padding: 15px;
+    padding: 20px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: bottom center;
@@ -155,40 +139,36 @@
   }
 
   .note.open {
-    transform: translateX(-50%) translateY(-15%);
+    transform: translateX(-50%) translateY(-20%);
   }
 
   .note-content {
-    font-size: 14px;
+    font-size: 16px;
     text-align: center;
     line-height: 1.4;
   }
 
   .note-content h3 {
-    margin: 0 0 10px 0;
-    font-size: 16px;
+    margin: 0 0 15px 0;
+    font-size: 20px;
     color: #d63384;
   }
 
   .note-content p {
-    margin: 0;
+    margin: 8px 0;
   }
 
   /* Paper tip indicator */
   .paper-tip-indicator {
     position: absolute;
-    top: -30px;
+    top: -40px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 12px;
+    font-size: 14px;
     color: rgba(255, 255, 255, 0.7);
-    opacity: 0;
+    opacity: 1;
     transition: opacity 0.3s ease;
     pointer-events: none;
-  }
-
-  .heart-shell:hover .paper-tip-indicator {
-    opacity: 1;
   }
 
   /* Big heart overlay */
@@ -213,11 +193,11 @@
     opacity: 1;
   }
 
-  /* Big heart */
+  /* Big heart - optimized for 1080x1980 mobile */
   .big-heart-shell {
     position: relative;
-    width: min(400px, 80vw);
-    height: min(360px, 72vw);
+    width: 500px;
+    height: 450px;
     cursor: default;
     transform: scale(0.3) rotate(-10deg);
     transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -231,10 +211,10 @@
   .big-heart-shell::before, .big-heart-shell::after {
     content: "";
     position: absolute;
-    width: 200px;
-    height: 320px;
+    width: 250px;
+    height: 400px;
     background: linear-gradient(145deg, #ff1493, #ff69b4, #ff1493);
-    border-radius: 200px 200px 0 0;
+    border-radius: 250px 250px 0 0;
     top: 0;
     box-shadow: 
       inset 0 0 40px rgba(255, 255, 255, 0.4),
@@ -244,7 +224,7 @@
   }
 
   .big-heart-shell::before {
-    left: 200px;
+    left: 250px;
     transform: rotate(-45deg);
     transform-origin: 0 100%;
   }
@@ -262,7 +242,7 @@
     75% { transform: translateY(-5px) rotate(-1deg) scale(1.01); }
   }
 
-  /* Big heart content - Fixed positioning to keep text inside */
+  /* Big heart content - optimized for mobile */
   .big-heart-content {
     position: absolute;
     top: 50%;
@@ -270,25 +250,25 @@
     transform: translate(-50%, -50%);
     text-align: center;
     color: white;
-    padding: 15px 10px;
-    width: 70%;
-    max-width: 280px;
+    padding: 25px 20px;
+    width: 80%;
+    max-width: 400px;
     z-index: 10;
     overflow: hidden;
     box-sizing: border-box;
   }
 
   .big-heart-title {
-    font-size: clamp(1.2rem, 4vw, 1.6rem);
-    margin-bottom: 12px;
+    font-size: 2.2rem;
+    margin-bottom: 20px;
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
     animation: titleShine 3s ease-in-out infinite;
     line-height: 1.1;
   }
 
   .big-heart-message {
-    font-size: clamp(0.8rem, 2.5vw, 0.95rem);
-    line-height: 1.3;
+    font-size: 1.1rem;
+    line-height: 1.4;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     overflow-wrap: break-word;
     word-wrap: break-word;
@@ -302,18 +282,18 @@
 
   .close-heart {
     position: absolute;
-    top: 15px;
-    right: 25px;
+    top: 20px;
+    right: 30px;
     background: rgba(255, 255, 255, 0.2);
     border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 22px;
     color: white;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
@@ -327,12 +307,12 @@
 
   /* Corner sunflowers */
   .corners{position:fixed; inset:0; pointer-events:none; z-index:10}
-  .corner-flower{position:absolute; font-size:clamp(40px,8vw,80px); opacity:.5; filter:drop-shadow(0 0 8px rgba(255,255,0,.5)); transition: all 0.3s ease;}
+  .corner-flower{position:absolute; font-size:clamp(50px,10vw,100px); opacity:.5; filter:drop-shadow(0 0 8px rgba(255,255,0,.5)); transition: all 0.3s ease;}
   .corner-flower:hover { transform: scale(1.2) rotate(180deg)!important; opacity: 0.8; }
-  .tl{top:8px;left:12px;transform:rotate(-15deg); animation: flowerSway1 6s ease-in-out infinite;} 
-  .tr{top:8px;right:12px;transform:rotate(15deg); animation: flowerSway2 7s ease-in-out infinite;}
-  .bl{bottom:8px;left:10px;transform:rotate(12deg); animation: flowerSway3 5s ease-in-out infinite;} 
-  .br{bottom:8px;right:10px;transform:rotate(-10deg); animation: flowerSway4 8s ease-in-out infinite;}
+  .tl{top:20px;left:20px;transform:rotate(-15deg); animation: flowerSway1 6s ease-in-out infinite;} 
+  .tr{top:20px;right:20px;transform:rotate(15deg); animation: flowerSway2 7s ease-in-out infinite;}
+  .bl{bottom:20px;left:20px;transform:rotate(12deg); animation: flowerSway3 5s ease-in-out infinite;} 
+  .br{bottom:20px;right:20px;transform:rotate(-10deg); animation: flowerSway4 8s ease-in-out infinite;}
 
   @keyframes flowerSway1 {
     0%, 100% { transform: rotate(-15deg) scale(1); }
@@ -391,19 +371,94 @@
     100% { transform: translateX(0); }
   }
 
-  @media (max-width:520px){
-    h1{font-size:1.5rem} button{font-size:.95rem; padding:9px 16px} .message{font-size:1rem}
-    .heart-container { width: 160px; height: 200px; bottom: 20px; }
-    .heart-shell { width: 160px; height: 144px; }
-    .heart-shell::before, .heart-shell::after { width: 80px; height: 128px; }
-    .heart-shell::before { left: 80px; }
-    .note { width: 140px; height: 180px; padding: 12px; }
-    .big-heart-content { padding: 12px 8px; width: 75%; max-width: 250px; }
+  /* Mobile specific optimizations for 1080x1980 */
+  @media (max-width: 1200px) {
+    h1 { font-size: 1.8rem; margin: 20px 15px 10px; }
+    button { font-size: 1.1rem; padding: 12px 24px; }
+    .message { font-size: 1.2rem; margin-top: 15px; }
+    
+    .heart-container { 
+      width: 320px; 
+      height: 360px; 
+      bottom: 100px; 
+    }
+    
+    .heart-shell { 
+      width: 320px; 
+      height: 288px; 
+    }
+    
+    .heart-shell::before, .heart-shell::after { 
+      width: 160px; 
+      height: 256px; 
+      border-radius: 160px 160px 0 0;
+    }
+    
+    .heart-shell::before { 
+      left: 160px; 
+    }
+    
+    .note { 
+      width: 280px; 
+      height: 320px; 
+      padding: 25px; 
+    }
+    
+    .note-content {
+      font-size: 18px;
+    }
+    
+    .note-content h3 {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+    
+    .paper-tip-indicator {
+      font-size: 16px;
+      top: -45px;
+    }
+
+    .big-heart-content { 
+      padding: 30px 25px; 
+      width: 85%; 
+      max-width: 450px; 
+    }
+    
+    .big-heart-title {
+      font-size: 2.5rem;
+      margin-bottom: 25px;
+    }
+    
+    .big-heart-message {
+      font-size: 1.3rem;
+      line-height: 1.5;
+    }
+  }
+
+  /* Fine-tuning for exactly 1080x1980 */
+  @media (max-width: 1080px) and (max-height: 1980px) {
+    .heart-container { 
+      bottom: 120px; 
+    }
+    
+    .big-heart-shell {
+      width: 600px;
+      height: 540px;
+    }
+    
+    .big-heart-shell::before, .big-heart-shell::after {
+      width: 300px;
+      height: 480px;
+      border-radius: 300px 300px 0 0;
+    }
+    
+    .big-heart-shell::before {
+      left: 300px;
+    }
   }
 </style>
 </head>
 <body>
-  <div class="cursor" id="cursor"></div>
   <canvas id="confettiCanvas"></canvas>
 
   <h1 id="question">Habuba, will you be my birthday girl forever؟ 🎂💖</h1>
@@ -464,7 +519,6 @@
   const note = document.getElementById('note');
   const bigHeartOverlay = document.getElementById('bigHeartOverlay');
   const closeHeart = document.getElementById('closeHeart');
-  const cursor = document.getElementById('cursor');
 
   let noClicks = 0;
   let noteOpened = false;
@@ -480,20 +534,6 @@
   }
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
-
-  // Custom cursor tracking
-  document.addEventListener('mousemove', (e) => {
-    cursor.style.left = e.clientX - 10 + 'px';
-    cursor.style.top = e.clientY - 10 + 'px';
-  });
-
-  document.addEventListener('mousedown', () => {
-    cursor.classList.add('click');
-  });
-
-  document.addEventListener('mouseup', () => {
-    cursor.classList.remove('click');
-  });
 
   // Interactive background - click to create magic particles
   document.addEventListener('click', (e) => {
