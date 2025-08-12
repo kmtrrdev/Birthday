@@ -18,42 +18,25 @@
     align-items:center; justify-content:center; overflow:hidden; text-align:center;
     transition: filter 0.5s ease;
   }
-  
+
   /* Blur effect - excludes the big heart */
-  body.blurred > *:not(.big-heart-overlay) {
-    filter: blur(8px);
-  }
+  body.blurred > *:not(.big-heart-overlay) { filter: blur(8px); }
 
   h1{font-size:2rem; margin:18px 12px 8px; transition: all 0.3s ease;}
   h1:hover { transform: scale(1.05); text-shadow: 0 0 20px rgba(255, 105, 180, 0.8); }
   
   .buttons{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
   button{padding:10px 20px;font-size:1.05rem;border:none;border-radius:10px;cursor:pointer;transition:.25s; position: relative; overflow: hidden;}
-  button::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    transition: width 0.3s ease, height 0.3s ease;
-    transform: translate(-50%, -50%);
+  button::before{
+    content:''; position:absolute; top:50%; left:50%; width:0; height:0;
+    background:rgba(255,255,255,.3); border-radius:50%;
+    transition:width .3s ease, height .3s ease; transform:translate(-50%,-50%);
   }
-  button:hover::before {
-    width: 300px;
-    height: 300px;
-  }
-  
+  button:hover::before{width:300px;height:300px}
   #yesBtn{background:var(--pink);color:#fff} #yesBtn:hover{transform:scale(1.06)}
   #noBtn{background:var(--red);color:#fff}
   .message{margin-top:10px;font-size:1.15rem;white-space:pre-line; animation: fadeIn 1s ease;}
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
   /* Heart rain */
   .heart-rain{
@@ -62,399 +45,151 @@
   }
   .heart-rain::before,.heart-rain::after{content:'';position:absolute;width:18px;height:18px;background:inherit;border-radius:50%}
   .heart-rain::before{top:-9px;left:0}.heart-rain::after{left:-9px;top:0}
-  @keyframes fallHeart{0%{transform:translateY(-10vh) rotate(45deg) scale(0);opacity:0}5%{opacity:.95; transform:translateY(-5vh) rotate(45deg) scale(1)}100%{transform:translateY(110vh) rotate(405deg) scale(0.5);opacity:0}}
+  @keyframes fallHeart{0%{transform:translateY(-10vh) rotate(45deg) scale(0);opacity:0}5%{opacity:.95; transform:translateY(-5vh) rotate(45deg) scale(1)}100%{transform:translateY(110vh) rotate(405deg) scale(.5);opacity:0}}
 
-  /* Heart container - optimized for mobile 1080x1980 */
-  .heart-container {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 200;
-    display: none;
-    width: 280px;
-    height: 320px;
+  /* Bottom heart */
+  .heart-container{
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+    z-index:200; display:none; width:280px; height:320px;
+  }
+  .heart-shell{position:relative; width:280px; height:252px; cursor:pointer; z-index:2; transition:all .3s ease; animation:heartPulse 2s ease-in-out infinite}
+  .heart-shell:hover{transform:scale(1.05); filter:drop-shadow(0 10px 25px rgba(255,105,180,.6))}
+  .heart-shell::before,.heart-shell::after{
+    content:""; position:absolute; width:140px; height:224px;
+    background:linear-gradient(145deg,#ff69b4,#ff1493); border-radius:140px 140px 0 0; top:0;
+    box-shadow:inset 0 0 20px rgba(255,255,255,.3), 0 5px 15px rgba(0,0,0,.3);
+  }
+  .heart-shell::before{left:140px; transform:rotate(-45deg); transform-origin:0 100%}
+  .heart-shell::after{left:0; transform:rotate(45deg); transform-origin:100% 100%}
+  @keyframes heartPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+
+  .note{
+    position:absolute; bottom:0; left:50%; transform:translateX(-50%) translateY(120%);
+    width:240px; height:280px; background:var(--paper); border-radius:10px; color:#333; padding:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,.4); transition:transform .8s cubic-bezier(.4,0,.2,1); transform-origin:bottom center; z-index:1;
+  }
+  .note.open{ transform:translateX(-50%) translateY(-20%) }
+  .note-content{font-size:16px; text-align:center; line-height:1.4}
+  .note-content h3{margin:0 0 15px 0; font-size:20px; color:#d63384}
+  .note-content p{margin:8px 0}
+  .paper-tip-indicator{position:absolute; top:-40px; left:50%; transform:translateX(-50%); font-size:14px; color:rgba(255,255,255,.7); opacity:1; transition:opacity .3s ease; pointer-events:none}
+
+  /* Overlay */
+  .big-heart-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(15px);
+    z-index:10000; display:none; align-items:center; justify-content:center; opacity:0;
+    transition:all .6s cubic-bezier(.4,0,.2,1); padding:20px; box-sizing:border-box;
+  }
+  .big-heart-overlay.active{display:flex; opacity:1}
+
+  /* BIG HEART — centered + no rectangle shadow */
+  .big-heart-shell{
+    position:absolute; left:50%; top:50%;
+    transform:translate(-50%,-50%) scale(.3) rotate(-10deg);
+    width:min(92vw, 520px);
+    aspect-ratio: 1 / 0.9;
+    max-width:520px;
+    cursor:default;
+    transition:transform .8s cubic-bezier(.68,-.55,.265,1.55);
+    animation:bigHeartFloat 4s ease-in-out infinite;
+    contain:layout paint;
+  }
+  .big-heart-overlay.active .big-heart-shell{
+    transform:translate(-50%,-50%) scale(1) rotate(0deg);
   }
 
-  /* Main heart - larger for mobile */
-  .heart-shell {
-    position: relative;
-    width: 280px;
-    height: 252px;
-    cursor: pointer;
-    z-index: 2;
-    transition: all 0.3s ease;
-    animation: heartPulse 2s ease-in-out infinite;
+  .big-heart-shell::before,
+  .big-heart-shell::after{
+    content:""; position:absolute; top:0;
+    width:50%; height:90%;
+    background:linear-gradient(145deg,#ff1493,#ff69b4,#ff1493);
+    border-radius:50% 50% 0 0 / 55% 55% 0 0;
+    /* Remove any rectangle/box shadow */
+    box-shadow:none;          /* <— removed */
+    filter:brightness(1.06);
+  }
+  .big-heart-shell::before{ left:50%; transform-origin:0 100%; transform:rotate(-45deg) }
+  .big-heart-shell::after{ left:0;   transform-origin:100% 100%; transform:rotate(45deg) }
+
+  @keyframes bigHeartFloat{
+    0%,100%{ transform:translate(-50%,-50%) scale(1) rotate(0) }
+    25%{    transform:translate(calc(-50%), calc(-50% - 10px)) scale(1.02) rotate(1deg) }
+    50%{    transform:translate(-50%,-50%) scale(1) rotate(0) }
+    75%{    transform:translate(calc(-50%), calc(-50% - 5px)) scale(1.01) rotate(-1deg) }
   }
 
-  .heart-shell:hover {
-    transform: scale(1.05);
-    filter: drop-shadow(0 10px 25px rgba(255, 105, 180, 0.6));
+  /* TEXT INSIDE BIG HEART — formatted */
+  .big-heart-content{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+    text-align:center; color:#fff;
+    padding:24px 18px; width:100%; height:100%;
+    z-index:10; box-sizing:border-box;
+  }
+  .big-heart-title{
+    font-size:clamp(22px, 5.8vw, 30px);
+    font-weight:800;
+    margin:0 0 10px 0;
+    letter-spacing:.3px;
+    text-shadow:0 0 8px rgba(255,255,255,.55);
+    line-height:1.15;
+  }
+  .big-heart-message{
+    font-size:clamp(14px, 4.2vw, 18px);
+    line-height:1.45;
+    max-width:84%;
+    margin:0 auto;
+    text-shadow:0 1px 6px rgba(0,0,0,.45);
+    word-break:break-word;
   }
 
-  .heart-shell::before, .heart-shell::after {
-    content: "";
-    position: absolute;
-    width: 140px;
-    height: 224px;
-    background: linear-gradient(145deg, #ff69b4, #ff1493);
-    border-radius: 140px 140px 0 0;
-    top: 0;
-    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3), 0 5px 15px rgba(0, 0, 0, 0.3);
+  .close-heart{
+    position:absolute; top:15px; right:20px; background:rgba(255,255,255,.22);
+    border:2px solid rgba(255,255,255,.55); border-radius:50%; width:40px; height:40px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:white;
+    transition:all .3s ease; backdrop-filter:blur(10px); z-index:15;
   }
-
-  .heart-shell::before {
-    left: 140px;
-    transform: rotate(-45deg);
-    transform-origin: 0 100%;
-  }
-
-  .heart-shell::after {
-    left: 0;
-    transform: rotate(45deg);
-    transform-origin: 100% 100%;
-  }
-
-  @keyframes heartPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-  }
-
-  /* Note - larger for mobile */
-  .note {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%) translateY(120%);
-    width: 240px;
-    height: 280px;
-    background: var(--paper);
-    border-radius: 10px;
-    color: #333;
-    padding: 20px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-origin: bottom center;
-    z-index: 1;
-  }
-
-  .note.open {
-    transform: translateX(-50%) translateY(-20%);
-  }
-
-  .note-content {
-    font-size: 16px;
-    text-align: center;
-    line-height: 1.4;
-  }
-
-  .note-content h3 {
-    margin: 0 0 15px 0;
-    font-size: 20px;
-    color: #d63384;
-  }
-
-  .note-content p {
-    margin: 8px 0;
-  }
-
-  /* Paper tip indicator */
-  .paper-tip-indicator {
-    position: absolute;
-    top: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
-    opacity: 1;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-  }
-
-  /* Big heart overlay */
-  .big-heart-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(15px);
-    z-index: 10000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .big-heart-overlay.active {
-    display: flex;
-    opacity: 1;
-  }
-
-  /* Big heart - optimized for 1080x1980 mobile */
-  .big-heart-shell {
-    position: relative;
-    width: 500px;
-    height: 450px;
-    cursor: default;
-    transform: scale(0.3) rotate(-10deg);
-    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    animation: bigHeartFloat 4s ease-in-out infinite;
-  }
-
-  .big-heart-overlay.active .big-heart-shell {
-    transform: scale(1) rotate(0deg);
-  }
-
-  .big-heart-shell::before, .big-heart-shell::after {
-    content: "";
-    position: absolute;
-    width: 250px;
-    height: 400px;
-    background: linear-gradient(145deg, #ff1493, #ff69b4, #ff1493);
-    border-radius: 250px 250px 0 0;
-    top: 0;
-    box-shadow: 
-      inset 0 0 40px rgba(255, 255, 255, 0.4),
-      0 20px 40px rgba(255, 20, 147, 0.6),
-      0 0 80px rgba(255, 105, 180, 0.4);
-    filter: brightness(1.1);
-  }
-
-  .big-heart-shell::before {
-    left: 250px;
-    transform: rotate(-45deg);
-    transform-origin: 0 100%;
-  }
-
-  .big-heart-shell::after {
-    left: 0;
-    transform: rotate(45deg);
-    transform-origin: 100% 100%;
-  }
-
-  @keyframes bigHeartFloat {
-    0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
-    25% { transform: translateY(-10px) rotate(1deg) scale(1.02); }
-    50% { transform: translateY(0px) rotate(0deg) scale(1); }
-    75% { transform: translateY(-5px) rotate(-1deg) scale(1.01); }
-  }
-
-  /* Big heart content - optimized for mobile */
-  .big-heart-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: white;
-    padding: 25px 20px;
-    width: 80%;
-    max-width: 400px;
-    z-index: 10;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-
-  .big-heart-title {
-    font-size: 2.2rem;
-    margin-bottom: 20px;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
-    animation: titleShine 3s ease-in-out infinite;
-    line-height: 1.1;
-  }
-
-  .big-heart-message {
-    font-size: 1.1rem;
-    line-height: 1.4;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    hyphens: auto;
-  }
-
-  @keyframes titleShine {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.9; transform: scale(1.02); }
-  }
-
-  .close-heart {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 22px;
-    color: white;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    z-index: 15;
-  }
-
-  .close-heart:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.1) rotate(90deg);
-  }
+  .close-heart:hover{ background:rgba(255,255,255,.32); transform:scale(1.1) rotate(90deg) }
 
   /* Corner sunflowers */
   .corners{position:fixed; inset:0; pointer-events:none; z-index:10}
-  .corner-flower{position:absolute; font-size:clamp(50px,10vw,100px); opacity:.5; filter:drop-shadow(0 0 8px rgba(255,255,0,.5)); transition: all 0.3s ease;}
-  .corner-flower:hover { transform: scale(1.2) rotate(180deg)!important; opacity: 0.8; }
-  .tl{top:20px;left:20px;transform:rotate(-15deg); animation: flowerSway1 6s ease-in-out infinite;} 
-  .tr{top:20px;right:20px;transform:rotate(15deg); animation: flowerSway2 7s ease-in-out infinite;}
-  .bl{bottom:20px;left:20px;transform:rotate(12deg); animation: flowerSway3 5s ease-in-out infinite;} 
-  .br{bottom:20px;right:20px;transform:rotate(-10deg); animation: flowerSway4 8s ease-in-out infinite;}
-
-  @keyframes flowerSway1 {
-    0%, 100% { transform: rotate(-15deg) scale(1); }
-    25% { transform: rotate(-10deg) scale(1.1); }
-    50% { transform: rotate(-20deg) scale(1); }
-    75% { transform: rotate(-5deg) scale(1.05); }
-  }
-  @keyframes flowerSway2 {
-    0%, 100% { transform: rotate(15deg) scale(1); }
-    33% { transform: rotate(20deg) scale(1.05); }
-    66% { transform: rotate(10deg) scale(1.1); }
-  }
-  @keyframes flowerSway3 {
-    0%, 100% { transform: rotate(12deg) scale(1); }
-    40% { transform: rotate(17deg) scale(1.08); }
-    80% { transform: rotate(7deg) scale(1.02); }
-  }
-  @keyframes flowerSway4 {
-    0%, 100% { transform: rotate(-10deg) scale(1); }
-    20% { transform: rotate(-5deg) scale(1.06); }
-    60% { transform: rotate(-15deg) scale(1.03); }
-  }
+  .corner-flower{position:absolute; font-size:clamp(50px,10vw,100px); opacity:.5; filter:drop-shadow(0 0 8px rgba(255,255,0,.5)); transition:all .3s ease;}
+  .corner-flower:hover{ transform:scale(1.2) rotate(180deg)!important; opacity:.8 }
+  .tl{top:20px;left:20px;transform:rotate(-15deg); animation:flowerSway1 6s ease-in-out infinite} 
+  .tr{top:20px;right:20px;transform:rotate(15deg); animation:flowerSway2 7s ease-in-out infinite}
+  .bl{bottom:20px;left:20px;transform:rotate(12deg); animation:flowerSway3 5s ease-in-out infinite} 
+  .br{bottom:20px;right:20px;transform:rotate(-10deg); animation:flowerSway4 8s ease-in-out infinite}
+  @keyframes flowerSway1{0%,100%{transform:rotate(-15deg) scale(1)}25%{transform:rotate(-10deg) scale(1.1)}50%{transform:rotate(-20deg) scale(1)}75%{transform:rotate(-5deg) scale(1.05)}}
+  @keyframes flowerSway2{0%,100%{transform:rotate(15deg) scale(1)}33%{transform:rotate(20deg) scale(1.05)}66%{transform:rotate(10deg) scale(1.1)}}
+  @keyframes flowerSway3{0%,100%{transform:rotate(12deg) scale(1)}40%{transform:rotate(17deg) scale(1.08)}80%{transform:rotate(7deg) scale(1.02)}}
+  @keyframes flowerSway4{0%,100%{transform:rotate(-10deg) scale(1)}20%{transform:rotate(-5deg) scale(1.06)}60%{transform:rotate(-15deg) scale(1.03)}}
 
   /* Magic particles */
-  .magic-particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: radial-gradient(circle, #ff69b4, transparent);
-    border-radius: 50%;
-    pointer-events: none;
-    animation: magicFloat 3s ease-out forwards;
-  }
-
-  @keyframes magicFloat {
-    0% { transform: translateY(0) scale(1); opacity: 1; }
-    100% { transform: translateY(-100px) scale(0); opacity: 0; }
-  }
+  .magic-particle{position:absolute; width:4px; height:4px; background:radial-gradient(circle,#ff69b4,transparent); border-radius:50%; pointer-events:none; animation:magicFloat 3s ease-out forwards}
+  @keyframes magicFloat{0%{transform:translateY(0) scale(1); opacity:1}100%{transform:translateY(-100px) scale(0); opacity:0}}
 
   /* Confetti Canvas */
-  #confettiCanvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    z-index: 9999;
-  }
+  #confettiCanvas{position:fixed; top:0; left:0; pointer-events:none; z-index:9999}
 
-  /* Glitch Effect */
-  @keyframes glitch {
-    0% { transform: translateX(0); }
-    20% { transform: translateX(-2px) rotateX(1deg); }
-    40% { transform: translateX(2px) rotateY(1deg); }
-    60% { transform: translateX(-1px) rotateX(-1deg); }
-    80% { transform: translateX(1px) rotateY(-1deg); }
-    100% { transform: translateX(0); }
-  }
+  /* Glitch */
+  @keyframes glitch{0%{transform:translateX(0)}20%{transform:translateX(-2px) rotateX(1deg)}40%{transform:translateX(2px) rotateY(1deg)}60%{transform:translateX(-1px) rotateX(-1deg)}80%{transform:translateX(1px) rotateY(-1deg)}100%{transform:translateX(0)}}
 
-  /* Mobile specific optimizations for 1080x1980 */
-  @media (max-width: 1200px) {
-    h1 { font-size: 1.8rem; margin: 20px 15px 10px; }
-    button { font-size: 1.1rem; padding: 12px 24px; }
-    .message { font-size: 1.2rem; margin-top: 15px; }
-    
-    .heart-container { 
-      width: 320px; 
-      height: 360px; 
-      bottom: 100px; 
-    }
-    
-    .heart-shell { 
-      width: 320px; 
-      height: 288px; 
-    }
-    
-    .heart-shell::before, .heart-shell::after { 
-      width: 160px; 
-      height: 256px; 
-      border-radius: 160px 160px 0 0;
-    }
-    
-    .heart-shell::before { 
-      left: 160px; 
-    }
-    
-    .note { 
-      width: 280px; 
-      height: 320px; 
-      padding: 25px; 
-    }
-    
-    .note-content {
-      font-size: 18px;
-    }
-    
-    .note-content h3 {
-      font-size: 22px;
-      margin-bottom: 20px;
-    }
-    
-    .paper-tip-indicator {
-      font-size: 16px;
-      top: -45px;
-    }
-
-    .big-heart-content { 
-      padding: 30px 25px; 
-      width: 85%; 
-      max-width: 450px; 
-    }
-    
-    .big-heart-title {
-      font-size: 2.5rem;
-      margin-bottom: 25px;
-    }
-    
-    .big-heart-message {
-      font-size: 1.3rem;
-      line-height: 1.5;
-    }
-  }
-
-  /* Fine-tuning for exactly 1080x1980 */
-  @media (max-width: 1080px) and (max-height: 1980px) {
-    .heart-container { 
-      bottom: 120px; 
-    }
-    
-    .big-heart-shell {
-      width: 600px;
-      height: 540px;
-    }
-    
-    .big-heart-shell::before, .big-heart-shell::after {
-      width: 300px;
-      height: 480px;
-      border-radius: 300px 300px 0 0;
-    }
-    
-    .big-heart-shell::before {
-      left: 300px;
-    }
+  /* Mobile tweaks */
+  @media (max-width:1200px){
+    h1{font-size:1.8rem; margin:20px 15px 10px}
+    button{font-size:1.1rem; padding:12px 24px}
+    .message{font-size:1.2rem; margin-top:15px}
+    .heart-container{width:320px; height:360px; bottom:100px}
+    .heart-shell{width:320px; height:288px}
+    .heart-shell::before,.heart-shell::after{width:160px; height:256px; border-radius:160px 160px 0 0}
+    .heart-shell::before{left:160px}
+    .note{width:280px; height:320px; padding:25px}
+    .note-content{font-size:18px}
+    .note-content h3{font-size:22px; margin-bottom:20px}
+    .paper-tip-indicator{font-size:16px; top:-45px}
+    .big-heart-title{font-size:clamp(22px,6vw,34px)}
+    .big-heart-message{font-size:clamp(15px,4.6vw,20px)}
   }
 </style>
 </head>
@@ -492,8 +227,7 @@
         <div class="big-heart-title">💖 Happy Birthday! 💖</div>
         <div class="big-heart-message">
           My dearest Habuba,<br>
-          On this special day, I wish you all the love, joy, and magical moments your heart can hold.<br>
-          <br>
+          On this special day, I wish you all the love, joy, and magical moments your heart can hold.<br><br>
           You make every day brighter! ✨<br>
           <strong>Forever yours 💕</strong>
         </div>
@@ -550,12 +284,8 @@
       particle.style.left = (x - 2) + 'px';
       particle.style.top = (y - 2) + 'px';
       particle.style.animationDelay = (i * 100) + 'ms';
-      
       document.body.appendChild(particle);
-      
-      setTimeout(() => {
-        particle.remove();
-      }, 3000);
+      setTimeout(() => particle.remove(), 3000);
     }
   }
 
@@ -571,12 +301,10 @@
 
   noBtn.addEventListener('click', () => {
     noClicks++;
-    
     createMagicParticles(
       noBtn.getBoundingClientRect().left + noBtn.offsetWidth/2,
       noBtn.getBoundingClientRect().top + noBtn.offsetHeight/2
     );
-    
     if (noClicks === 1) {
       question.textContent = "Please...? 🥹 It's your birthday!";
       question.style.color = '#ffeb3b';
@@ -624,117 +352,75 @@
       heart.style.height=size+'px';
       heart.style.left=Math.random()*100+'vw'; 
       heart.style.animationDuration=2+Math.random()*4+'s';
-      
-      const colors = ['#ff7eb6', '#ff3b3b', '#ff69b4', '#ff1493', '#ffd6e9'];
-      heart.style.background=colors[Math.floor(Math.random() * colors.length)]; 
+      const colors=['#ff7eb6','#ff3b3b','#ff69b4','#ff1493','#ffd6e9'];
+      heart.style.background=colors[Math.floor(Math.random()*colors.length)]; 
       document.body.appendChild(heart);
       setTimeout(()=>heart.remove(),8000);
     };
-    
     for(let i=0;i<50;i++) setTimeout(spawn,i*40); 
-    setInterval(spawn, 100);
+    setInterval(spawn,100);
   }
 
-  // Heart click functionality
+  // Heart click
   heartShell.addEventListener('click', () => {
     noteOpened = !noteOpened;
     note.classList.toggle('open', noteOpened);
-    
     if (noteOpened) {
       burstConfetti(heartShell);
-      setTimeout(() => {
-        openBigHeart();
-      }, 1000);
+      setTimeout(() => openBigHeart(), 1000);
     }
   });
 
-  // Big heart functionality
-  function openBigHeart() {
+  // Big heart open/close
+  function openBigHeart(){
     document.body.classList.add('blurred');
     bigHeartOverlay.classList.add('active');
-    
-    setTimeout(() => {
-      createMagicParticles(window.innerWidth / 2, window.innerHeight / 2);
-    }, 500);
+    setTimeout(()=>createMagicParticles(window.innerWidth/2, window.innerHeight/2), 500);
   }
-
-  closeHeart.addEventListener('click', closeBigHeart);
-  bigHeartOverlay.addEventListener('click', (e) => {
-    if (e.target === bigHeartOverlay) {
-      closeBigHeart();
-    }
-  });
-
-  function closeBigHeart() {
+  function closeBigHeart(){
     document.body.classList.remove('blurred');
     bigHeartOverlay.classList.remove('active');
   }
+  document.getElementById('closeHeart').addEventListener('click', closeBigHeart);
+  bigHeartOverlay.addEventListener('click', (e)=>{ if(e.target===bigHeartOverlay) closeBigHeart() });
 
-  // Enhanced confetti system
-  function burstConfetti(elem) {
-    const rect = elem.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    for (let i = 0; i < 120; i++) {
+  // Confetti
+  function burstConfetti(elem){
+    const rect=elem.getBoundingClientRect();
+    const centerX=rect.left+rect.width/2;
+    const centerY=rect.top+rect.height/2;
+    for(let i=0;i<120;i++){
       confettiPieces.push({
-        x: centerX,
-        y: centerY,
-        r: Math.random() * 8 + 3,
-        c: `hsl(${Math.random() * 360},100%,50%)`,
-        vx: (Math.random() - 0.5) * 8,
-        vy: Math.random() * -8 - 4,
-        a: 1,
-        gravity: 0.1
+        x:centerX,y:centerY,r:Math.random()*8+3,
+        c:`hsl(${Math.random()*360},100%,50%)`,
+        vx:(Math.random()-.5)*8, vy:Math.random()*-8-4, a:1, gravity:.1
       });
     }
   }
-
-  function drawConfetti() {
-    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-    confettiPieces.forEach((p, i) => {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += p.gravity;
-      p.a -= 0.008;
-      
-      ctx.globalAlpha = p.a;
-      ctx.fillStyle = p.c;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
-      
-      if (p.a <= 0 || p.y > confettiCanvas.height) {
-        confettiPieces.splice(i, 1);
-      }
+  function drawConfetti(){
+    ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+    confettiPieces.forEach((p,i)=>{
+      p.x+=p.vx; p.y+=p.vy; p.vy+=p.gravity; p.a-=.008;
+      ctx.globalAlpha=p.a; ctx.fillStyle=p.c; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+      if(p.a<=0 || p.y>confettiCanvas.height) confettiPieces.splice(i,1);
     });
     requestAnimationFrame(drawConfetti);
   }
   drawConfetti();
 
-  // Keyboard controls
+  // Keys
   document.addEventListener('keydown',(e)=>{
-    if((e.key==='Enter'||e.key===' ') && document.body.contains(yesBtn)){ 
-      yesBtn.click(); 
-    } else if (e.key === 'Escape' && bigHeartOverlay.classList.contains('active')) {
-      closeBigHeart();
-    } else if ((e.key === 'h' || e.key === 'H') && heartContainer.style.display !== 'none') {
-      heartShell.click();
-    }
+    if((e.key==='Enter'||e.key===' ') && document.body.contains(yesBtn)) yesBtn.click();
+    else if(e.key==='Escape' && bigHeartOverlay.classList.contains('active')) closeBigHeart();
+    else if((e.key==='h'||e.key==='H') && heartContainer.style.display!=='none') heartShell.click();
   });
 
-  // Add subtle particles on page load
-  setTimeout(() => {
-    for (let i = 0; i < 15; i++) {
-      setTimeout(() => {
-        createMagicParticles(
-          Math.random() * window.innerWidth,
-          Math.random() * window.innerHeight
-        );
-      }, i * 300);
+  // Subtle particles on load
+  setTimeout(()=>{
+    for(let i=0;i<15;i++){
+      setTimeout(()=>createMagicParticles(Math.random()*window.innerWidth, Math.random()*window.innerHeight), i*300);
     }
-  }, 1000);
-
+  },1000);
 </script>
 </body>
 </html>
