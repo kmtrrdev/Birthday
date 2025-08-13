@@ -220,6 +220,17 @@
 </head>
 <body>
   <canvas id="confettiCanvas"></canvas>
+  
+  <!-- Background music for Yes -->
+  <audio id="backgroundMusic" loop>
+    <source src="Albumaty.Com_tww_lyt_naryn.mp3" type="audio/mp3">
+  </audio>
+
+  <!-- Sound effect for No button -->
+  <audio id="noSound" preload="auto">
+    <source src="omarfarag.mpeg" type="audio/mpeg">
+    <!-- You can replace with any sound URL or local file -->
+  </audio>
 
   <h1 id="question" class="glow">Habuba, will you be my birthday girl forever?🎂💖</h1>
 
@@ -278,9 +289,53 @@
   const note = document.getElementById('note');
   const bigHeartOverlay = document.getElementById('bigHeartOverlay');
   const closeHeart = document.getElementById('closeHeart');
+  const backgroundMusic = document.getElementById('backgroundMusic');
+  const noSound = document.getElementById('noSound');
 
   let noClicks = 0;
   let noteOpened = false;
+
+  // Start music function - only called when Yes is clicked
+  function startMusic() {
+    backgroundMusic.volume = 0.3;
+    backgroundMusic.play().catch(e => {
+      console.log('Could not play music:', e);
+    });
+  }
+
+  // Play No sound effect
+  function playNoSound() {
+    noSound.currentTime = 0; // Reset to beginning
+    noSound.volume = 1; // 50% volume
+    noSound.play().catch(e => {
+      console.log('Could not play no sound:', e);
+      // Fallback: create a simple beep sound using Web Audio API
+      createBeepSound();
+    });
+  }
+
+  // Fallback beep sound using Web Audio API
+  function createBeepSound() {
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800; // Frequency in Hz
+      oscillator.type = 'square'; // Type of sound wave
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (e) {
+      console.log('Could not create beep sound:', e);
+    }
+  }
 
   // Confetti setup
   const confettiCanvas = document.getElementById("confettiCanvas");
@@ -340,6 +395,9 @@
 
   // Button interactions
   yesBtn.addEventListener('click', () => {
+    // Start music only when Yes is clicked
+    startMusic();
+    
     yesBtn.remove(); 
     noBtn.remove(); 
     question.textContent = "";
@@ -349,12 +407,16 @@
   });
 
   noBtn.addEventListener('click', () => {
+    // Play sound effect when No is clicked
+    
     noClicks++;
     createMagicParticles(
       noBtn.getBoundingClientRect().left + noBtn.offsetWidth/2,
       noBtn.getBoundingClientRect().top + noBtn.offsetHeight/2
     );
     if (noClicks === 1) {
+          playNoSound();
+
       question.textContent = "💔!بجد والله";
       question.style.color = '#ffeb3b';
     } else if (noClicks === 2) {
