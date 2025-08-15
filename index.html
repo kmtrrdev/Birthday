@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
- <title>Habuba's Birthday</title>
+<title>Habuba's Birthday</title>
 <meta name="description" content="Celebrating Habuba's Birthday with love, fun, and memories.">
 <style>
   *{box-sizing:border-box}
@@ -88,8 +88,8 @@
   .big-heart-overlay{
     position:fixed; inset:0; 
     background:rgba(0,0,0,.5);
-    backdrop-filter: blur(15px);           /* <-- BLUR */
-    -webkit-backdrop-filter: blur(15px);   /* Safari support */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     z-index:10000; display:none; align-items:center; justify-content:center; opacity:0;
     transition:opacity .5s cubic-bezier(.4,0,.2,1); padding:20px; box-sizing:border-box;
     pointer-events:auto;
@@ -147,6 +147,13 @@
     z-index:10; box-sizing:border-box;
     overflow:auto;
     pointer-events:auto;
+    /* Hide scrollbar */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  /* Hide scrollbar for webkit browsers */
+  .big-heart-content::-webkit-scrollbar {
+    display: none;
   }
   .big-heart-title{
     font-size:clamp(20px, 4vw, 22px);
@@ -167,6 +174,20 @@
     word-break:break-word;
     hyphens:auto;
   }
+
+  /* New: controls inside the big heart */
+  .overlay-btn{
+    margin-top:14px; padding:10px 18px; border:none; border-radius:12px; cursor:pointer;
+    background:#ff69b4; color:#fff; font-weight:600; transition:.25s;
+    text-shadow: 0 0 6px rgba(255,255,255,.6), 0 0 12px rgba(255,105,180,.7);
+  }
+  .overlay-btn:hover{ transform:scale(1.06) }
+  .choice-btn{
+    margin:6px; padding:10px 18px; border:none; border-radius:12px; cursor:pointer; font-weight:700;
+    text-shadow: 0 0 6px rgba(255,255,255,.6), 0 0 12px rgba(255,105,180,.7);
+  }
+  .choice-yes{ background:#27ae60; color:#fff }
+  .choice-no{ background:#e53935; color:#fff }
 
   .close-heart{
     position:absolute; top:15px; right:20px; background:rgba(255,255,255,.22);
@@ -224,13 +245,12 @@
   
   <!-- Background music for Yes -->
   <audio id="backgroundMusic" loop>
-    <source src="Albumaty.Com_tww_lyt_naryn.mp3" type="audio/mp3">
+    <source src="hseny.mp3" type="audio/mp3">
   </audio>
 
   <!-- Sound effect for No button -->
   <audio id="noSound" preload="auto">
     <source src="Omarfarag.mp3" type="audio/mp3">
-    <!-- You can replace with any sound URL or local file -->
   </audio>
 
   <h1 id="question" class="glow">Habuba, will you be my birthday girl forever?🎂💖</h1>
@@ -262,11 +282,25 @@
       <div class="close-heart" id="closeHeart" aria-label="Close" tabindex="0">×</div>
       <div class="big-heart-content">
         <div class="big-heart-title" id="bigHeartTitle">💖 Happy Birthday! 💖</div>
-        <div class="big-heart-message">
+
+        <!-- Main message -->
+        <div class="big-heart-message" id="bigHeartMessage">
           My dearest Habuba,<br>
           On this special day, I wish you all the love, joy, and magical moments your heart can hold.<br>
           You make every day brighter! ✨<br>
           <strong>Forever yours 💕</strong>
+        </div>
+
+        <!-- New: Finished Reading button -->
+        <button id="finishedReadingBtn" class="overlay-btn">✅ Finished Reading</button>
+
+        <!-- New: Relationship question (hidden until Finished Reading is clicked) -->
+        <div id="relationshipQuestion" style="display:none; margin-top:18px;">
+          <p style="font-size:18px; margin-bottom:10px;">mwaf2a nkoon sawa wla la2? ❤️</p>
+          <div>
+            <button id="relationshipYes" class="choice-btn choice-yes">Yes</button>
+            <button id="relationshipNo" class="choice-btn choice-no">No</button>
+          </div>
         </div>
       </div>
     </div>
@@ -293,52 +327,46 @@
   const backgroundMusic = document.getElementById('backgroundMusic');
   const noSound = document.getElementById('noSound');
 
+  /* New refs */
+  const finishedReadingBtn = document.getElementById('finishedReadingBtn');
+  const relationshipQuestion = document.getElementById('relationshipQuestion');
+  const relationshipYes = document.getElementById('relationshipYes');
+  const relationshipNo = document.getElementById('relationshipNo');
+
   let noClicks = 0;
   let noteOpened = false;
 
-  // Start music function - only called when Yes is clicked
   function startMusic() {
     backgroundMusic.volume = 0.08;
-    backgroundMusic.play().catch(e => {
-      console.log('Could not play music:', e);
-    });
+    backgroundMusic.play().catch(e => { console.log('Could not play music:', e); });
   }
 
-  // Play No sound effect
   function playNoSound() {
-    noSound.currentTime = 0; // Reset to beginning
-    noSound.volume = 1; // 50% volume
+    noSound.currentTime = 0;
+    noSound.volume = 1;
     noSound.play().catch(e => {
       console.log('Could not play no sound:', e);
-      // Fallback: create a simple beep sound using Web Audio API
       createBeepSound();
     });
   }
 
-  // Fallback beep sound using Web Audio API
   function createBeepSound() {
     try {
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
-      
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = 800; // Frequency in Hz
-      oscillator.type = 'square'; // Type of sound wave
-      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'square';
       gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-      
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.5);
-    } catch (e) {
-      console.log('Could not create beep sound:', e);
-    }
+    } catch (e) { console.log('Could not create beep sound:', e); }
   }
 
-  // Confetti setup
+  /* Confetti setup */
   const confettiCanvas = document.getElementById("confettiCanvas");
   const ctx = confettiCanvas.getContext("2d");
   let confettiPieces = [];
@@ -350,7 +378,7 @@
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
-  // Interactive background - click to create magic particles
+  /* Interactive background particles */
   document.addEventListener('click', (e) => {
     if (!e.target.closest('button') && !e.target.closest('.heart-shell') && 
         !e.target.closest('.big-heart-overlay')) {
@@ -370,7 +398,7 @@
     }
   }
 
-  // Heart rain with start/stop control
+  /* Heart rain */
   let heartRainInterval = null;
   function startHeartRain(){
     const spawn=()=>{
@@ -394,11 +422,9 @@
     document.querySelectorAll('.heart-rain').forEach(h=>h.remove());
   }
 
-  // Button interactions
+  /* Main buttons */
   yesBtn.addEventListener('click', () => {
-    // Start music only when Yes is clicked
     startMusic();
-    
     yesBtn.remove(); 
     noBtn.remove(); 
     question.textContent = "";
@@ -408,16 +434,13 @@
   });
 
   noBtn.addEventListener('click', () => {
-    // Play sound effect when No is clicked
-    
     noClicks++;
     createMagicParticles(
       noBtn.getBoundingClientRect().left + noBtn.offsetWidth/2,
       noBtn.getBoundingClientRect().top + noBtn.offsetHeight/2
     );
     if (noClicks === 1) {
-          playNoSound();
-
+      playNoSound();
       question.textContent = "💔!بجد والله";
       question.style.color = '#ffeb3b';
     } else if (noClicks === 2) {
@@ -454,7 +477,7 @@
     button.style.transform = `rotate(${Math.random() * 20 - 10}deg)`;
   }
 
-  // Heart click
+  /* Heart click (open note + big heart) */
   let injectedOnce = false;
   heartShell.addEventListener('click', () => {
     noteOpened = !noteOpened;
@@ -462,15 +485,16 @@
     if (noteOpened) {
       if(!injectedOnce){
         setBigHeartMessage(
-          `Habubty❤️<br>
-           Happy Birthday, ya Habibty 🎉<br>
-           mn3rf4 ba3d mn zaman bas ana awl ma 4oft ayoonk alhelween ally bydwbo alwahed gwahm feha taka raheba kda bet4ed w23tny kda belra8m mn a5r fatra kont m4 areef h3ml m3aky eh w ra8m kol haga bt2oleha btdai2ny aw bt2flny mnk bas alhaga alwahrda ally mot2kd mnha ane bhbk w m4 ayez banota 8erk f hyaty <br>
+          `Habuba❤️<br>
+          Happy Birthday, ya Habibty 🎉<br>
+          yarb alsana de tkoon helwa aleeky w th22y kol ally nfsk feh w nkoon sawa mn awl ma shoft ayounk w23t w dobt feky w habb a2olk ane bhbk w mn awl ma 3rftk mhaset4 ane 3aiz ay bnt tanya f hyaty
           <br>
-          Anty Bta3tyy Ana W bs😉<br>
+          r8m ank daymn bthsseny ano one way feeling w m4 bb2a fahm ay haga bas mfee4 8eer haga wahda f3ln fahmha ane habetk
+          <br>
           a3tbreeh proposal 3la 5afef kda😂
           <br>
           <strong>Love You❤️</strong>`,
-          false // set true to force RTL
+          false
         );
         injectedOnce = true;
       }
@@ -479,11 +503,11 @@
     }
   });
 
-  // Big heart open/close — overlay blurs background
+  /* Big heart open/close */
   function openBigHeart(){
     document.body.style.overflow = 'hidden';
     stopHeartRain();
-    bigHeartOverlay.classList.add('active');  // <-- triggers backdrop blur
+    bigHeartOverlay.classList.add('active');
     setTimeout(()=>createMagicParticles(window.innerWidth/2, window.innerHeight/2), 500);
   }
   function closeBigHeart(){
@@ -494,12 +518,11 @@
   document.getElementById('closeHeart').addEventListener('click', closeBigHeart);
   bigHeartOverlay.addEventListener('click', (e)=>{ if(e.target===bigHeartOverlay) closeBigHeart() });
 
-  // Make close button keyboard-friendly
   closeHeart.addEventListener('keydown', (e)=>{
     if(e.key==='Enter' || e.key===' '){ e.preventDefault(); closeBigHeart(); }
   });
 
-  // Confetti
+  /* Confetti */
   function burstConfetti(elem){
     const rect=elem.getBoundingClientRect();
     const centerX=rect.left+rect.width/2;
@@ -523,32 +546,50 @@
   }
   drawConfetti();
 
-  // Keys
+  /* Keys */
   document.addEventListener('keydown',(e)=>{
     if((e.key==='Enter'||e.key===' ') && document.body.contains(yesBtn)) yesBtn.click();
     else if(e.key==='Escape' && bigHeartOverlay.classList.contains('active')) closeBigHeart();
     else if((e.key==='h'||e.key==='H') && heartContainer.style.display!=='none') heartShell.click();
   });
 
-  // Subtle particles on load
   setTimeout(()=>{
     for(let i=0;i<15;i++){
       setTimeout(()=>createMagicParticles(Math.random()*window.innerWidth, Math.random()*window.innerHeight), i*300);
     }
   },1000);
 
-  // Helper: set message + RTL/LTR
   function setBigHeartMessage(html, isArabic=false){
     const box = document.querySelector('.big-heart-message');
     box.innerHTML = html;
     box.setAttribute('dir', isArabic ? 'rtl' : 'ltr');
   }
 
+  /* New: Finished Reading -> reveal question and scroll */
+  finishedReadingBtn.addEventListener('click', ()=>{
+    relationshipQuestion.style.display = 'block';
+    relationshipQuestion.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  });
+
+  /* New: handlers for Yes/No inside the big heart question */
+  relationshipYes.addEventListener('click', ()=>{
+    burstConfetti(document.querySelector('.big-heart-shell'));
+    setBigHeartMessage('🥳 Akhiran!!! Ana bhebaaaaaaak ❤️<br><strong>We are officially sawa!</strong>');
+    relationshipQuestion.style.display='none';
+    finishedReadingBtn.style.display='none';
+  });
+
+  relationshipNo.addEventListener('click', ()=>{
+    createMagicParticles(window.innerWidth/2, window.innerHeight/2);
+    setBigHeartMessage('okay ya habuba rbna ywf2k b abn alhalal❤️');
+    relationshipQuestion.style.display='none';
+    finishedReadingBtn.style.display='none';
+    
+    // Show message for 5 seconds then close the heart
+    setTimeout(() => {
+      closeBigHeart();
+    }, 5000);
+  });
 </script>
 </body>
 </html>
-
-
-
-
-
